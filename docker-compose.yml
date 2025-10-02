@@ -1,0 +1,21 @@
+
+services:
+  api:
+    build: ./backend
+    container_name: conta_api
+    env_file:
+      - ./backend/.env.example
+    volumes:
+      - ./backend/data:/app/data
+    ports:
+      - "8000:8000"
+  web:
+    build: ./frontend
+    container_name: conta_web
+    environment:
+      - VITE_API_URL=http://localhost:8000
+    ports:
+      - "5173:5173"
+      - "4173:4173"
+    depends_on:
+      - api
