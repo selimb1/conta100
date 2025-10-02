@@ -1,7 +1,11 @@
 # backend/app/services/ocr_parser.py
 from typing import Dict
+import logging
 import re
 import os
+
+
+logger = logging.getLogger(__name__)
 
 def _read_text(path: str) -> str:
     """Lee texto de PDF (si tiene texto) o de imagen (si hay Tesseract). Devuelve '' si no puede."""
@@ -16,6 +20,7 @@ def _read_text(path: str) -> str:
                 pages = [p.extract_text() or "" for p in pdf.pages]
             text = "\n".join(pages)
         except Exception:
+            logger.exception("No se pudo extraer texto embebido del PDF %s", path)
             text = ""
 
     # Imagen con OCR (opcional)
@@ -28,6 +33,7 @@ def _read_text(path: str) -> str:
             img = img.convert("L")
             text = pytesseract.image_to_string(img, lang="spa")
         except Exception:
+            logger.exception("Error realizando OCR sobre la imagen %s", path)
             text = ""
 
     return text or ""
